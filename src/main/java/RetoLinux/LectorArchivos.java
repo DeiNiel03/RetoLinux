@@ -20,7 +20,7 @@ import com.opencsv.CSVReader;
 
 public class LectorArchivos {
 
-	public static final char SEPARATOR=';';
+	public static final String SEPARATOR=";";
 	public static final char QUOTE='"';
 
 	/**
@@ -47,6 +47,19 @@ public class LectorArchivos {
 
 		return resultado;
 	}
+	
+	
+	
+	
+	private static String[] removeTrailingQuotes(String[] fields) {
+
+	      String result[] = new String[fields.length];
+
+	      for (int i=0;i<result.length;i++){
+	         result[i] = fields[i].replaceAll("^"+QUOTE, "").replaceAll(QUOTE+"$", "");
+	      }
+	      return result;
+	   }
 
 	/**
 	 * Devuelve el contenido del archivo CSV cuyo nombre se le pasa por parametro
@@ -55,23 +68,29 @@ public class LectorArchivos {
 	 */
 	public String leerArchivoCSV(String nombreArchivo) {
 
-		CSVReader reader = null;
+		BufferedReader br = null;
 		String resultado = "";
 		String path = System.getProperty("user.dir") + "//" + nombreArchivo; //films_score.csv
 		try {
-			reader = new CSVReader(new FileReader(path));
-			String[] nextLine=null;
+			 br =new BufferedReader(new FileReader(path));
+			 String line = br.readLine();
 
-			while ((nextLine = reader.readNext()) != null) {
-				System.out.println(Arrays.toString(nextLine));
+			while (null!=line) {
+				String [] fields = line.split(SEPARATOR);
+				System.out.println(Arrays.toString(fields));
+				
+				fields = removeTrailingQuotes(fields);
+	            System.out.println(Arrays.toString(fields));
+	            
+	            line = br.readLine();
 			}
 
 		} catch (Exception e) {
 			//Excepci�n que corresponda
 		} finally {
-			if (null != reader) {
+			if (null != br) {
 				try {
-					reader.close();
+					br.close();
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
